@@ -22,7 +22,9 @@ class AgentState(TypedDict):
 def run_model(state: AgentState) -> dict:
     model = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
     # Bind tools to the model
-    model_with_tools = model.bind_tools([search_tool])
+    available_tools = [search_tool]
+    model_with_tools = model.bind_tools(available_tools)
+    
     result = model_with_tools.invoke(state["messages"])
     return {"messages": [result]}
 
