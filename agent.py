@@ -14,6 +14,8 @@ def search_tool(query: str) -> str:
     # In a real app, this would use a search API
     return f"Result for '{query}': Example search result."
 
+available_tools = [search_tool]
+
 # 2. Define the agent state
 class AgentState(TypedDict):
     messages: Annotated[list[BaseMessage], operator.add]
@@ -22,14 +24,13 @@ class AgentState(TypedDict):
 def run_model(state: AgentState) -> dict:
     model = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
     # Bind tools to the model
-    available_tools = [search_tool]
     model_with_tools = model.bind_tools(available_tools)
     
     result = model_with_tools.invoke(state["messages"])
     return {"messages": [result]}
 
 # 4. Define the tool node
-tool_node = ToolNode([search_tool])
+tool_node = ToolNode(available_tools)
 
 # 5. Define the graph logic (conditional edge)
 def should_continue(state: AgentState) -> str:
